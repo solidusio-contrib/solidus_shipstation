@@ -94,7 +94,7 @@ There are a few gotchas you need to be aware of:
 
 - If you change the shipping method of an order in ShipStation, the change will not be reflected in
   Solidus and the tracking link might not work properly.
-- When `shipstation_capture_at_notification` is enabled, any errors during payment capture will
+- When `capture_at_notification` is enabled, any errors during payment capture will
   prevent the update of the shipment's tracking number.
 
 ## Development
