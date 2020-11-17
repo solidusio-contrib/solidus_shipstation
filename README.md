@@ -81,7 +81,7 @@ ShipStation description | ShipStation status | Solidus status
 Awaiting Payment        | `unpaid`           | `pending`
 Awaiting Shipment       | `paid`             | `ready`
 Shipped                 | `shipped`          | `shipped`
-Cancelled               | `cancelled`        | `cancelled`
+Cancelled               | `cancelled`        | `canceled`
 On-Hold                 | `on-hold`          | `pending`
 
 ## Usage
