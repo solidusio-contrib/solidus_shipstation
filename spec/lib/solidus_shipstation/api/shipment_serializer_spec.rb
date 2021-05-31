@@ -8,5 +8,18 @@ RSpec.describe SolidusShipstation::Api::ShipmentSerializer do
 
       expect(result).to be_instance_of(Hash)
     end
+
+    it 'sets residential = false in address if company is given' do
+      order = create(:order_ready_to_ship,
+        bill_address: build(:address, company: 'ACME Co.'),
+        ship_address: build(:address, company: nil))
+      shipment = order.shipments.first
+
+      serializer = described_class.new(store_id: '12345678')
+      result = serializer.call(shipment)
+
+      expect(result[:billTo][:residential]).to be true
+      expect(result[:shipTo][:residential]).to be false
+    end
   end
 end
