@@ -60,6 +60,7 @@ module SolidusShipstation
           postalCode: address.zipcode,
           country: address.country&.iso,
           phone: address.phone,
+          residential: address.company.present?
         }
       end
 
