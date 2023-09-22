@@ -21,7 +21,7 @@ module SolidusShipstation
       private
 
       def select_shipments(shipments)
-        shipments.select do |shipment|
+        shipments.includes(:order).select do |shipment|
           if ThresholdVerifier.call(shipment)
             true
           else
