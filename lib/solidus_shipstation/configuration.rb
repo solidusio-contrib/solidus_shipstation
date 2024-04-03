@@ -24,7 +24,7 @@ module SolidusShipstation
       @api_batch_size = 100
       @api_sync_threshold = 7.days
       @api_request_attempts = 1
-      @error_handler = ->(_error, _extra = {}) {
+      @error_handler = ->(error, extra = {}) {
         Rails.logger.error "#{error.inspect} (#{extra.inspect})"
       }
       @api_shipment_matcher = proc do |shipstation_order, shipments|
