@@ -33,6 +33,17 @@ module SolidusShipstation
 
         request_runner.call(:post, '/orders/createorders', params)
       end
+
+      def create_order(shipment)
+        begin
+          params = shipment_serializer.call(shipment)
+        rescue StandardError => e
+          error_handler.call(e, shipment: shipment)
+          return
+        end
+
+        request_runner.call(:post, '/orders/createorder', params)
+      end
     end
   end
 end

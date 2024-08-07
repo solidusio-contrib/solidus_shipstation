@@ -29,12 +29,9 @@ module SolidusShipstation
           )
 
           raise e
-        rescue RequestError => e
-          ::Spree::Bus.publish(:'solidus_shipstation.api.sync_errored',
-            shipments: shipments,
-            error: e)
-
-          raise e
+        rescue RequestError => _e
+          sync_batch_shipments_sequentially(shipments)
+          return
         end
 
         return unless response
@@ -46,10 +43,51 @@ module SolidusShipstation
 
       UNMODIFIABLE_RX = /The order with orderKey "\w+" is inactive and cannot be modified/.freeze
 
+      def sync_batch_shipments_sequentially(shipments)
+        shipstation_synced_shipments = []
+        failed_shipments = []
+        error_messages = []
+
+        shipments.each do |shipment|
+          next if shipment.unsyncable?
+
+          begin
+            shipstation_order = create_order(shipment)
+            next unless shipstation_order
+
+            shipstation_synced_shipments << shipment
+          rescue RateLimitedError => e
+            ::Spree::Bus.publish(:'solidus_shipstation.api.rate_limited',
+                                 shipments: shipments - shipstation_synced_shipments,
+                                 error: e
+            )
+            raise e
+          rescue RequestError => e
+            failed_shipments << shipment
+            mark_shipment_unsyncable(shipment, e)
+            error_messages << e.message
+            next
+          end
+        end
+
+        if failed_shipments.any?
+          error_message = error_messages.join('.')
+          ::Spree::Bus.publish(:'solidus_shipstation.api.sync_errored',
+            shipments: failed_shipments,
+            error: error_message
+          )
+
+          raise StandardError.new(error_message)
+        end
+      end
+
       def post_sync(shipstation_order, shipments)
         shipment = shipment_matcher.call(shipstation_order, shipments)
 
-        return false if failed?(shipstation_order, shipment)
+        if failed?(shipstation_order, shipment)
+          mark_shipment_unsyncable(shipment, shipstation_order.fetch('errorMessage'))
+          return false
+        end
 
         sync_opts = {
           shipstation_synced_at: Time.zone.now,
@@ -76,6 +114,11 @@ module SolidusShipstation
         ::Spree::Bus.publish(:'solidus_shipstation.api.sync_failed',
           shipment: shipment,
           payload: shipstation_order)
+      end
+
+      def mark_shipment_unsyncable(shipment, message)
+        shipment.send_failed_shipstation_sync_slack_alert(message)
+        shipment.touch(:unsyncable)
       end
     end
   end
