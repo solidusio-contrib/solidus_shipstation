@@ -94,14 +94,19 @@ RSpec.describe SolidusShipstation::Api::SyncShipmentsJob do
     end
 
     it 'fires a solidus_shipstation.api.sync_skipped event' do
-      stub_const('Spree::Event', class_spy(Spree::Event))
       shipment = build_stubbed(:shipment) { |s| stub_syncability(s, false) }
+
+      allow(Spree::Bus).to receive(:publish).with(
+        :'solidus_shipstation.api.sync_skipped',
+        shipment: shipment,
+      )
+
       stub_successful_batch_syncer
 
       described_class.perform_now([shipment])
 
-      expect(Spree::Event).to have_received(:fire).with(
-        'solidus_shipstation.api.sync_skipped',
+      expect(Spree::Bus).to have_received(:publish).with(
+        :'solidus_shipstation.api.sync_skipped',
         shipment: shipment,
       )
     end
