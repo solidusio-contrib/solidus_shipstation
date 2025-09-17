@@ -9,7 +9,7 @@ module SolidusShipstation
 
       module ClassMethods
         def exportable
-          ::Spree::Deprecation.warn <<~DEPRECATION
+          ::Spree.deprecator.warn <<~DEPRECATION
             `Spree::Shipment.exportable` is deprecated and will be removed in a future version
             of solidus_shipstation. Please use `SolidusShipstation::Shipment::ExportableQuery.apply`.
           DEPRECATION
@@ -18,7 +18,7 @@ module SolidusShipstation
         end
 
         def between(from, to)
-          ::Spree::Deprecation.warn <<~DEPRECATION
+          ::Spree.deprecator.warn <<~DEPRECATION
             `Spree::Shipment.between` is deprecated and will be removed in a future version
             of solidus_shipstation. Please use `SolidusShipstation::Shipment::BetweenQuery.apply`.
           DEPRECATION

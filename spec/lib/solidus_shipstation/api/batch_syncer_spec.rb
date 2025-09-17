@@ -47,8 +47,18 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
         end
 
         it 'emits a solidus_shipstation.api.sync_completed event' do
-          stub_const('Spree::Event', class_spy(Spree::Event))
           shipment = instance_spy('Spree::Shipment', number: 'H123456')
+
+          allow(Spree::Bus).to receive(:publish).with(
+            :'solidus_shipstation.api.sync_completed',
+            shipment: shipment,
+            payload: {
+              'orderNumber' => shipment.number,
+              'success' => true,
+              'orderId' => '123456',
+            },
+          )
+
           api_client = instance_double(SolidusShipstation::Api::Client).tap do |client|
             allow(client).to receive(:bulk_create_orders).with([shipment]).and_return(
               {
@@ -65,8 +75,8 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
 
           build_batch_syncer(client: api_client).call([shipment])
 
-          expect(Spree::Event).to have_received(:fire).with(
-            'solidus_shipstation.api.sync_completed',
+          expect(Spree::Bus).to have_received(:publish).with(
+            :'solidus_shipstation.api.sync_completed',
             shipment: shipment,
             payload: {
               'orderNumber' => shipment.number,
@@ -100,8 +110,18 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
         end
 
         it 'emits a solidus_shipstation.api.sync_failed event' do
-          stub_const('Spree::Event', class_spy(Spree::Event))
           shipment = instance_spy('Spree::Shipment', number: 'H123456')
+
+          allow(Spree::Bus).to receive(:publish).with(
+            :'solidus_shipstation.api.sync_failed',
+            shipment: shipment,
+            payload: {
+              'orderNumber' => shipment.number,
+              'success' => false,
+              'orderId' => '123456',
+            },
+          )
+
           api_client = instance_double(SolidusShipstation::Api::Client).tap do |client|
             allow(client).to receive(:bulk_create_orders).with([shipment]).and_return(
               {
@@ -118,8 +138,8 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
 
           build_batch_syncer(client: api_client).call([shipment])
 
-          expect(Spree::Event).to have_received(:fire).with(
-            'solidus_shipstation.api.sync_failed',
+          expect(Spree::Bus).to have_received(:publish).with(
+            :'solidus_shipstation.api.sync_failed',
             shipment: shipment,
             payload: {
               'orderNumber' => shipment.number,
@@ -133,14 +153,21 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
 
     context 'when the API call hits a rate limit' do
       it 'emits a solidus_shipstation.api.rate_limited event' do
-        stub_const('Spree::Event', class_spy(Spree::Event))
         shipment = instance_double('Spree::Shipment')
+
         error = SolidusShipstation::Api::RateLimitedError.new(
           response_headers: { 'X-Rate-Limit-Reset' => 20 },
           response_body: '{"message":"Too Many Requests"}',
           response_code: 429,
           retry_in: 20.seconds,
         )
+
+        allow(Spree::Bus).to receive(:publish).with(
+          :'solidus_shipstation.api.rate_limited',
+          shipments: [shipment],
+          error: error,
+        )
+
         api_client = instance_double(SolidusShipstation::Api::Client).tap do |client|
           allow(client).to receive(:bulk_create_orders).with([shipment]).and_raise(error)
         end
@@ -151,8 +178,8 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
           # We want to ignore the error here, since we're testing for the event.
         end
 
-        expect(Spree::Event).to have_received(:fire).with(
-          'solidus_shipstation.api.rate_limited',
+        expect(Spree::Bus).to have_received(:publish).with(
+          :'solidus_shipstation.api.rate_limited',
           shipments: [shipment],
           error: error,
         )
@@ -178,13 +205,19 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
 
     context 'when the API call results in a server error' do
       it 'emits a solidus_shipstation.api.sync_errored event' do
-        stub_const('Spree::Event', class_spy(Spree::Event))
         shipment = instance_double('Spree::Shipment')
         error = SolidusShipstation::Api::RequestError.new(
           response_headers: {},
           response_body: '{"message":"Internal Server Error"}',
           response_code: 500,
         )
+
+        allow(Spree::Bus).to receive(:publish).with(
+          :'solidus_shipstation.api.sync_errored',
+          shipments: [shipment],
+          error: error,
+        )
+
         api_client = instance_double(SolidusShipstation::Api::Client).tap do |client|
           allow(client).to receive(:bulk_create_orders).with([shipment]).and_raise(error)
         end
@@ -195,21 +228,27 @@ RSpec.describe SolidusShipstation::Api::BatchSyncer do
           # We want to ignore the error here, since we're testing for the event.
         end
 
-        expect(Spree::Event).to have_received(:fire).with(
-          'solidus_shipstation.api.sync_errored',
+        expect(Spree::Bus).to have_received(:publish).with(
+          :'solidus_shipstation.api.sync_errored',
           shipments: [shipment],
           error: error,
         )
       end
 
       it 're-raises the error' do
-        stub_const('Spree::Event', class_spy(Spree::Event))
         shipment = instance_double('Spree::Shipment')
         error = SolidusShipstation::Api::RequestError.new(
           response_headers: {},
           response_body: '{"message":"Internal Server Error"}',
           response_code: 500,
         )
+
+        allow(Spree::Bus).to receive(:publish).with(
+          :'solidus_shipstation.api.sync_errored',
+          shipments: [shipment],
+          error: error,
+        )
+
         api_client = instance_double(SolidusShipstation::Api::Client).tap do |client|
           allow(client).to receive(:bulk_create_orders).with([shipment]).and_raise(error)
         end

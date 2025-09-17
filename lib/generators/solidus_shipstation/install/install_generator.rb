@@ -8,6 +8,7 @@ module SolidusShipstation
 
       def copy_initializer
         template 'initializer.rb', 'config/initializers/solidus_shipstation.rb'
+        template 'omnes_initializer.rb', 'config/initializers/omnes.rb'
       end
 
       def add_migrations

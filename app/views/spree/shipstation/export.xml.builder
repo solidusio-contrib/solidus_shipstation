@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-xml = Builder::XmlMarkup.new
 xml.instruct!
 xml.Orders(pages: (@shipments.total_count / 50.0).ceil) {
   @shipments.each do |shipment|
