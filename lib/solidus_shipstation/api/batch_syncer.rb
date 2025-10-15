@@ -7,7 +7,7 @@ module SolidusShipstation
         def from_config
           new(
             client: SolidusShipstation::Api::Client.from_config,
-            shipment_matcher: SolidusShipstation.config.api_shipment_matcher,
+            shipment_matcher: SolidusShipstation.config.api_shipment_matcher
           )
         end
       end
@@ -24,17 +24,17 @@ module SolidusShipstation
           response = client.bulk_create_orders(shipments)
         rescue RateLimitedError => e
           ::Spree::Bus.publish(
-            :'solidus_shipstation.api.rate_limited',
+            :"solidus_shipstation.api.rate_limited",
             shipments: shipments,
-            error: e,
+            error: e
           )
 
           raise e
         rescue RequestError => e
           ::Spree::Bus.publish(
-            :'solidus_shipstation.api.sync_errored',
+            :"solidus_shipstation.api.sync_errored",
             shipments: shipments,
-            error: e,
+            error: e
           )
 
           raise e
@@ -42,14 +42,14 @@ module SolidusShipstation
 
         return unless response
 
-        response['results'].each do |shipstation_order|
+        response["results"].each do |shipstation_order|
           shipment = shipment_matcher.call(shipstation_order, shipments)
 
-          unless shipstation_order['success']
+          unless shipstation_order["success"]
             ::Spree::Bus.publish(
-              :'solidus_shipstation.api.sync_failed',
+              :"solidus_shipstation.api.sync_failed",
               shipment: shipment,
-              payload: shipstation_order,
+              payload: shipstation_order
             )
 
             next
@@ -57,11 +57,11 @@ module SolidusShipstation
 
           shipment.update_columns(
             shipstation_synced_at: Time.zone.now,
-            shipstation_order_id: shipstation_order['orderId'],
+            shipstation_order_id: shipstation_order["orderId"]
           )
 
           ::Spree::Bus.publish(
-            :'solidus_shipstation.api.sync_completed',
+            :"solidus_shipstation.api.sync_completed",
             shipment: shipment,
             payload: shipstation_order
           )

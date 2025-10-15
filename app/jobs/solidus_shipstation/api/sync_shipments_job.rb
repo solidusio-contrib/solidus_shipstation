@@ -26,7 +26,7 @@ module SolidusShipstation
             true
           else
             ::Spree::Bus.publish(
-              :'solidus_shipstation.api.sync_skipped',
+              :"solidus_shipstation.api.sync_skipped",
               shipment: shipment
             )
 

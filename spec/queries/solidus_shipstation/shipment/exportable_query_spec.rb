@@ -1,7 +1,7 @@
 RSpec.describe SolidusShipstation::Shipment::ExportableQuery do
-  describe '.apply' do
-    context 'when capture_at_notification is false and export_canceled_shipments is false' do
-      it 'returns ready shipments from complete orders' do
+  describe ".apply" do
+    context "when capture_at_notification is false and export_canceled_shipments is false" do
+      it "returns ready shipments from complete orders" do
         stub_configuration(capture_at_notification: false, export_canceled_shipments: false)
 
         ready_shipment = create(:order_ready_to_ship).shipments.first
@@ -12,8 +12,8 @@ RSpec.describe SolidusShipstation::Shipment::ExportableQuery do
       end
     end
 
-    context 'when capture_at_notification is true and export_canceled_shipments is false' do
-      it 'returns non-canceled shipments from complete orders' do
+    context "when capture_at_notification is true and export_canceled_shipments is false" do
+      it "returns non-canceled shipments from complete orders" do
         stub_configuration(capture_at_notification: true, export_canceled_shipments: false)
 
         ready_shipment = create(:order_ready_to_ship).shipments.first
@@ -24,8 +24,8 @@ RSpec.describe SolidusShipstation::Shipment::ExportableQuery do
       end
     end
 
-    context 'when capture_at_notification is false and export_canceled_shipments is true' do
-      it 'returns ready and canceled shipments from complete orders' do
+    context "when capture_at_notification is false and export_canceled_shipments is true" do
+      it "returns ready and canceled shipments from complete orders" do
         stub_configuration(capture_at_notification: false, export_canceled_shipments: true)
 
         ready_shipment = create(:order_ready_to_ship).shipments.first
@@ -37,8 +37,8 @@ RSpec.describe SolidusShipstation::Shipment::ExportableQuery do
       end
     end
 
-    context 'when capture_at_notification is true and export_canceled_shipments is true' do
-      it 'returns all shipments from complete orders' do
+    context "when capture_at_notification is true and export_canceled_shipments is true" do
+      it "returns all shipments from complete orders" do
         stub_configuration(capture_at_notification: true, export_canceled_shipments: true)
 
         ready_shipment = create(:order_ready_to_ship).shipments.first

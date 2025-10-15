@@ -28,10 +28,10 @@ module SolidusShipstation
         Rails.logger.error "#{error.inspect} (#{extra.inspect})"
       }
       @api_shipment_matcher = proc do |shipstation_order, shipments|
-        shipments.find { |shipment| shipment.number == shipstation_order['orderNumber'] }
+        shipments.find { |shipment| shipment.number == shipstation_order["orderNumber"] }
       end
 
-      @shipment_notice_class = 'SolidusShipstation::ShipmentNotice'
+      @shipment_notice_class = "SolidusShipstation::ShipmentNotice"
     end
   end
 
@@ -40,7 +40,7 @@ module SolidusShipstation
       @configuration ||= Configuration.new
     end
 
-    alias config configuration
+    alias_method :config, :configuration
 
     def configure
       yield configuration

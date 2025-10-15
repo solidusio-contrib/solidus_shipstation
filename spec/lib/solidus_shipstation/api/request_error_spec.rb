@@ -1,29 +1,29 @@
 RSpec.describe SolidusShipstation::Api::RequestError do
-  describe '.from_response' do
-    it 'extracts the status code, body and headers from the response' do
+  describe ".from_response" do
+    it "extracts the status code, body and headers from the response" do
       response = instance_double(
-        'HTTParty::Response',
+        "HTTParty::Response",
         code: 500,
-        headers: { 'Key' => 'Value' },
-        body: '{ "Message": "An error has occured.", "ExceptionMessage": "orders are required", "ExceptionType": "System.ArgumentException" }',
+        headers: {"Key" => "Value"},
+        body: '{ "Message": "An error has occured.", "ExceptionMessage": "orders are required", "ExceptionType": "System.ArgumentException" }'
       )
 
       error = described_class.from_response(response)
 
       expect(error).to have_attributes(
         response_code: 500,
-        response_headers: { 'Key' => 'Value' },
-        response_body: '{ "Message": "An error has occured.", "ExceptionMessage": "orders are required", "ExceptionType": "System.ArgumentException" }',
+        response_headers: {"Key" => "Value"},
+        response_body: '{ "Message": "An error has occured.", "ExceptionMessage": "orders are required", "ExceptionType": "System.ArgumentException" }'
       )
     end
   end
 
-  describe '.message' do
-    it 'returns the name of the exception if there is no message body' do
+  describe ".message" do
+    it "returns the name of the exception if there is no message body" do
       response = instance_double(
-        'HTTParty::Response',
+        "HTTParty::Response",
         code: 500,
-        headers: { 'Key' => 'Value' },
+        headers: {"Key" => "Value"},
         body: nil
       )
 
@@ -32,12 +32,12 @@ RSpec.describe SolidusShipstation::Api::RequestError do
       expect(error.message).to eq("SolidusShipstation::Api::RequestError")
     end
 
-    it 'extracts both the ExceptionMessage and ExceptionType' do
+    it "extracts both the ExceptionMessage and ExceptionType" do
       response = instance_double(
-        'HTTParty::Response',
+        "HTTParty::Response",
         code: 500,
-        headers: { 'Key' => 'Value' },
-        body: '{ "Message": "An error has occured.", "ExceptionMessage": "orders are required", "ExceptionType": "System.ArgumentException" }',
+        headers: {"Key" => "Value"},
+        body: '{ "Message": "An error has occured.", "ExceptionMessage": "orders are required", "ExceptionType": "System.ArgumentException" }'
       )
 
       error = described_class.from_response(response)
@@ -45,12 +45,12 @@ RSpec.describe SolidusShipstation::Api::RequestError do
       expect(error.message).to eq("System.ArgumentException: orders are required")
     end
 
-    it 'doesn\'t fail when the ExceptionMessage and ExceptionType are missing' do
+    it "doesn't fail when the ExceptionMessage and ExceptionType are missing" do
       response = instance_double(
-        'HTTParty::Response',
+        "HTTParty::Response",
         code: 500,
-        headers: { 'Key' => 'Value' },
-        body: '{ "Message": "An error has occured." }',
+        headers: {"Key" => "Value"},
+        body: '{ "Message": "An error has occured." }'
       )
 
       error = described_class.from_response(response)

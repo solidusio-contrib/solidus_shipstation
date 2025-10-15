@@ -8,7 +8,7 @@ module SolidusShipstation
       def from_payload(params)
         new(
           shipment_number: params[:order_number],
-          shipment_tracking: params[:tracking_number],
+          shipment_tracking: params[:tracking_number]
         )
       end
     end

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe Spree::Shipment do
-  describe '.between' do
-    it 'delegates to BetweenQuery' do
+  describe ".between" do
+    it "delegates to BetweenQuery" do
       shipment = build_stubbed(:shipment)
       allow(SolidusShipstation::Shipment::BetweenQuery).to receive(:apply).with(
         any_args,
         from: Time.zone.yesterday,
-        to: Time.zone.today,
+        to: Time.zone.today
       ).and_return([shipment])
 
       result = Spree.deprecator.silence do
@@ -17,7 +17,7 @@ RSpec.describe Spree::Shipment do
       expect(result).to eq([shipment])
     end
 
-    it 'prints a deprecation warning' do
+    it "prints a deprecation warning" do
       allow(Spree.deprecator).to receive(:warn)
 
       described_class.between(Time.zone.yesterday, Time.zone.today)
@@ -26,8 +26,8 @@ RSpec.describe Spree::Shipment do
     end
   end
 
-  describe '.exportable' do
-    it 'delegates to ExportableQuery' do
+  describe ".exportable" do
+    it "delegates to ExportableQuery" do
       shipment = build_stubbed(:shipment)
       allow(SolidusShipstation::Shipment::ExportableQuery).to receive(:apply).and_return([shipment])
 
@@ -38,7 +38,7 @@ RSpec.describe Spree::Shipment do
       expect(result).to eq([shipment])
     end
 
-    it 'prints a deprecation warning' do
+    it "prints a deprecation warning" do
       allow(Spree.deprecator).to receive(:warn)
 
       described_class.exportable
