@@ -20,7 +20,8 @@ end
 # Needed to help Bundler figure out how to resolve dependencies,
 # otherwise it takes forever to resolve them.
 # See https://github.com/bundler/bundler/issues/6677
-gem "rails", ">0.a"
+rails_requirement_string = ENV.fetch("RAILS_VERSION", "~> 8.0")
+gem "rails", rails_requirement_string
 
 # Provides basic authentication functionality for testing parts of your engine
 gem "solidus_auth_devise"
@@ -33,7 +34,10 @@ when "mysql"
 when "postgresql"
   gem "pg"
 else
-  gem "sqlite3"
+  rails_version = Gem::Requirement.new(rails_requirement_string).requirements[0][1]
+  sqlite_version = (rails_version < Gem::Version.new(7.2)) ? "~> 1.4" : "~> 2.0"
+
+  gem "sqlite3", sqlite_version
 end
 
 gemspec
