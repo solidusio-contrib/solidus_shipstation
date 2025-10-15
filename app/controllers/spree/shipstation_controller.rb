@@ -11,7 +11,7 @@ module Spree
       @shipments = SolidusShipstation::Shipment::BetweenQuery.apply(
         @shipments,
         from: date_param(:start_date),
-        to: date_param(:end_date),
+        to: date_param(:end_date)
       )
       @shipments = @shipments.page(params[:page]).per(50)
 
@@ -24,7 +24,7 @@ module Spree
       shipment_notice_class = SolidusShipstation.configuration.shipment_notice_class.constantize
       shipment_notice_class.from_payload(params.to_unsafe_h).apply
       head :ok
-    rescue SolidusShipstation::Error => e
+    rescue SolidusShipstation::Error
       head :bad_request
     end
 
@@ -33,7 +33,7 @@ module Spree
     def date_param(name)
       return if params[name].blank?
 
-      Time.strptime("#{params[name]} UTC", '%m/%d/%Y %H:%M %Z')
+      Time.strptime("#{params[name]} UTC", "%m/%d/%Y %H:%M %Z")
     end
 
     def authenticate_shipstation

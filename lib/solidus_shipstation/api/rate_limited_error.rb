@@ -8,7 +8,7 @@ module SolidusShipstation
       class << self
         def options_from_response(response)
           super.merge(
-            retry_in: response.headers['X-Rate-Limit-Reset'].to_i.seconds,
+            retry_in: response.headers["X-Rate-Limit-Reset"].to_i.seconds
           )
         end
       end

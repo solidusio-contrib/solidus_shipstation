@@ -13,19 +13,19 @@ module SolidusShipstation
         order = shipment.order
 
         state = case shipment.state
-                when 'ready'
-                  'awaiting_shipment'
-                when 'shipped'
-                  'shipped'
-                when 'pending'
-                  if ::Spree::Config.require_payment_to_ship && !shipment.order.paid?
-                    'awaiting_payment'
-                  else
-                    'on_hold'
-                  end
-                when 'canceled'
-                  'cancelled'
-                end
+        when "ready"
+          "awaiting_shipment"
+        when "shipped"
+          "shipped"
+        when "pending"
+          if ::Spree::Config.require_payment_to_ship && !shipment.order.paid?
+            "awaiting_payment"
+          else
+            "on_hold"
+          end
+        when "canceled"
+          "cancelled"
+        end
 
         {
           orderNumber: shipment.number,
@@ -40,10 +40,10 @@ module SolidusShipstation
           shipTo: serialize_address(order.ship_address),
           items: shipment.line_items.map(&method(:serialize_line_item)),
           shippingAmount: shipment.cost,
-          paymentMethod: 'Credit Card',
+          paymentMethod: "Credit Card",
           advancedOptions: {
-            storeId: store_id,
-          },
+            storeId: store_id
+          }
         }
       end
 
@@ -76,8 +76,8 @@ module SolidusShipstation
           adjustment: false,
           weight: {
             value: line_item.variant.weight.to_f,
-            units: SolidusShipstation.config.weight_units,
-          },
+            units: SolidusShipstation.config.weight_units
+          }
         }
       end
     end

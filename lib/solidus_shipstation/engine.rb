@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'solidus_core'
-require 'solidus_support'
+require "solidus_core"
+require "solidus_support"
 
 module SolidusShipstation
   class Engine < Rails::Engine
@@ -9,7 +9,7 @@ module SolidusShipstation
 
     isolate_namespace ::Spree
 
-    engine_name 'solidus_shipstation'
+    engine_name "solidus_shipstation"
 
     # use rspec for tests
     config.generators do |g|

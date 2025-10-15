@@ -1,12 +1,12 @@
 RSpec.describe SolidusShipstation::Shipment::BetweenQuery do
-  describe '.apply' do
-    it 'returns shipments whose updated_at falls within the given time range' do
+  describe ".apply" do
+    it "returns shipments whose updated_at falls within the given time range" do
       shipment = create(:shipment) { |s| s.update_column(:updated_at, Time.zone.now) }
 
       result = described_class.apply(
         Spree::Shipment.all,
         from: Time.zone.yesterday,
-        to: Time.zone.tomorrow,
+        to: Time.zone.tomorrow
       )
 
       expect(result).to eq([shipment])
@@ -19,19 +19,19 @@ RSpec.describe SolidusShipstation::Shipment::BetweenQuery do
       result = described_class.apply(
         Spree::Shipment.all,
         from: Time.zone.yesterday,
-        to: Time.zone.tomorrow,
+        to: Time.zone.tomorrow
       )
 
       expect(result).to eq([shipment])
     end
 
-    it 'does not return shipments whose updated_at does not fall within the given time range' do
+    it "does not return shipments whose updated_at does not fall within the given time range" do
       create(:shipment) { |s| s.update_column(:updated_at, Time.zone.now) }
 
       result = described_class.apply(
         Spree::Shipment.all,
         from: Time.zone.tomorrow,
-        to: Time.zone.tomorrow + 1.day,
+        to: Time.zone.tomorrow + 1.day
       )
 
       expect(result).to eq([])
@@ -44,7 +44,7 @@ RSpec.describe SolidusShipstation::Shipment::BetweenQuery do
       result = described_class.apply(
         Spree::Shipment.all,
         from: Time.zone.tomorrow,
-        to: Time.zone.tomorrow + 1.day,
+        to: Time.zone.tomorrow + 1.day
       )
 
       expect(result).to eq([])

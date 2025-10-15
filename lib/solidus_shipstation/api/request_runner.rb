@@ -3,7 +3,7 @@
 module SolidusShipstation
   module Api
     class RequestRunner
-      API_BASE = 'https://ssapi.shipstation.com'
+      API_BASE = "https://ssapi.shipstation.com"
 
       attr_reader :username, :password
 
@@ -11,7 +11,7 @@ module SolidusShipstation
         def from_config
           new(
             username: SolidusShipstation.config.api_key,
-            password: SolidusShipstation.config.api_secret,
+            password: SolidusShipstation.config.api_secret
           )
         end
       end
@@ -28,18 +28,18 @@ module SolidusShipstation
           body: params.to_json,
           basic_auth: {
             username: @username,
-            password: @password,
+            password: @password
           },
           headers: {
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-          },
+            "Content-Type" => "application/json",
+            "Accept" => "application/json"
+          }
         )
 
         case response.code.to_s
         when /2\d{2}/
           response.parsed_response
-        when '429'
+        when "429"
           raise RateLimitedError.from_response(response)
         else
           raise RequestError.from_response(response)
