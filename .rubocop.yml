@@ -1,14 +1,5 @@
-inherit_from: .rubocop_todo.yml
-
 require:
-  - solidus_dev_support/rubocop
+  - standard
 
-AllCops:
-  NewCops: disable
-  TargetRubyVersion: 2.5
-
-Layout/LineLength:
-  Enabled: false
-
-Rails/SkipsModelValidations:
-  Enabled: false
+inherit_gem:
+  standard: config/base.yml

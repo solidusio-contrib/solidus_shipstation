@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'httparty', '~> 0.18'
   spec.add_dependency 'solidus_core', ['> 4', '< 5']
   spec.add_dependency 'solidus_support', '~> 0.5'
+  spec.add_dependency 'standard', '~> 1.49'
 
   spec.add_development_dependency 'rails-controller-testing'
   spec.add_development_dependency 'rspec-xsd'
