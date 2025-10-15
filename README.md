@@ -64,7 +64,7 @@ Cancelled               | `cancelled`        | `cancelled`
 On-Hold                 | `on-hold`          | `pending`
 
 Once you've configured the XML integration in your app and ShipStation, there's nothing else you
-need to do. ShipStation will 
+need to do. ShipStation will
 
 #### XML integration: Usage
 
@@ -152,10 +152,10 @@ app if it does not exist, then it will run specs. The dummy app can be regenerat
 bin/rake
 ```
 
-To run [Rubocop](https://github.com/bbatsov/rubocop) static code analysis run
+To run [Standard](https://github.com/standardrb/standard)
 
 ```shell
-bundle exec rubocop
+bundle exec standardrb --fix
 ```
 
 When testing your application's integration with this extension you may use its factories.
