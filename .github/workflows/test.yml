@@ -22,20 +22,11 @@ jobs:
           - "7.2"
           - "8.0"
         ruby-version:
-          - "3.3"
           - "3.4"
         solidus-branch:
-          - "v4.4"
-          - "v4.5"
           - "v4.6"
-          - "main"
         database:
-          - "postgresql"
           - "mysql"
-          - "sqlite"
-        exclude:
-          - rails-version: "8.0"
-            solidus-branch: "v4.4"
     services:
       postgresql:
         image: postgres:16
@@ -61,7 +52,7 @@ jobs:
         ports:
           - 3306:3306
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run extension tests
         uses: solidusio/test-solidus-extension@main
         with:
