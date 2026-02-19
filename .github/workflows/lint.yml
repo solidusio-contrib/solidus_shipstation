@@ -10,44 +10,61 @@ permissions:
   contents: read
 
 jobs:
-  rspec:
-    name: Solidus ${{ matrix.solidus-branch }}, Rails ${{ matrix.rails-version }} and Ruby ${{ matrix.ruby-version }} on ${{ matrix.database }}
-    runs-on: ubuntu-24.04
+  RSpec:
+    name: Rails ${{ matrix.rails }}, Ruby ${{ matrix.ruby }}, ${{ matrix.database }}, ${{ matrix.storage }}
+    runs-on: ubuntu-22.04
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         rails-version:
           - "7.2"
           - "8.0"
+          - "8.1"
         ruby-version:
           - "3.4"
         solidus-branch:
-          - "v4.6"
+          - "main"
         database:
           - "mysql"
+    env:
+      BUNDLE_WITHOUT: "lint release"
+      COVERAGE_DIR: ${{ github.workspace }}/${{ inputs.lib_name }}/coverage
+      DB: ${{ matrix.database }}
+      DB_HOST: "127.0.0.1"
+      DB_USERNAME: solidus
+      DB_PASSWORD: password
+      DEFAULT_MAX_WAIT_TIME: 10
+      DISABLE_ACTIVE_STORAGE: ${{ matrix.storage == 'paperclip' }}
+      LIB_NAME: ${{ inputs.lib_name }}
+      RAILS_ENV: test
+      RAILS_VERSION: '~> ${{ matrix.rails }}'
+      SOLIDUS_RAISE_DEPRECATIONS: true
     services:
-      postgresql:
-        image: postgres:16
+      postgres:
+        image: postgres:13
         env:
-          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: ${{ env.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+          POSTGRES_DB: solidus_${{ inputs.lib_name }}_test
+        ports: [5432:5432]
         options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-        ports:
-          - 5432:5432
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       mysql:
-        image: mysql:8
+        image: mysql:5.7
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
+          MYSQL_PASSWORD: ${{ env.DB_PASSWORD }}
+          MYSQL_USER: ${{ env.DB_USERNAME }}
+          MYSQL_DATABASE: solidus_${{ inputs.lib_name }}_test
+        ports: [3306:3306]
         options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-        ports:
-          - 3306:3306
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v6
       - name: Run extension tests
