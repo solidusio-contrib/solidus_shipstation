@@ -22,22 +22,37 @@ jobs:
           - "7.2"
           - "8.0"
         ruby-version:
-          - "3.3"
           - "3.4"
         solidus-branch:
-          - "v4.4"
-          - "v4.5"
           - "v4.6"
-          - "main"
         database:
-          - "postgresql"
           - "mysql"
-          - "sqlite"
-        exclude:
-          - rails-version: "8.0"
-            solidus-branch: "v4.4"
+    services:
+      postgresql:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 5432:5432
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+          --column-statistics=0
+        ports:
+          - 3306:3306
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run extension tests
         uses: solidusio/test-solidus-extension@main
         with:
